@@ -2,6 +2,7 @@ from pololu_motor_control.maestro import Controller
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int16, Bool
+from time import sleep
 
 # Converts ardusub thruster mappings to pololu
 # ardusub: pololu
@@ -45,6 +46,8 @@ class MaestroWritter(Node):
             # Re-enable the channel
             self.arm()
             
+            sleep(1)
+
             # Re-enable
             self.arm()
             self.arm_status = True
