@@ -84,8 +84,10 @@ class MaestroWritter(Node):
         # Check if armed
         self.update_motor(2, message.data)
     
-    def updateMessage: Int16):
+    def updateMotor3(self, message: Int16):
         # Check if armed
+        self.update_motor(3, message.data)
+
     def updateMotor4(self, message: Int16):
         # Check if armed
         self.update_motor(4, message.data)
@@ -113,7 +115,7 @@ def main():
     while rclpy.ok():
         rclpy.spin(marco_polo)
     marco_polo.get_logger().warning("Shutting down")
-    marco_polo.disarm()
+    marco_polo.disarm
 
     
 if __name__ == '__main__':
