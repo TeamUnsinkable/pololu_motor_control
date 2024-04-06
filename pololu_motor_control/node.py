@@ -1,6 +1,6 @@
-from maestro import Controller
+from pololu_motor_control.maestro import Controller
 import rclpy
-from rclpy import Node
+from rclpy.node import Node
 from std_msgs.msg import Int16, Bool
 
 # Converts ardusub thruster mappings to pololu
