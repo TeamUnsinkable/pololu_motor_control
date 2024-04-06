@@ -37,6 +37,7 @@ class MaestroWritter(Node):
         self.motor_8_sub = self.create_subscription(Int16, "/motor8/output", self.updateMotor8, 5)
 
         self.polo = Controller(ttyStr=self.get_parameter("port").get_parameter_value().string_value)
+        self.get_logger().warning("The spinny boys be spinning")
 
     def _translate_pwm(self, pwm: int):
         return pwm*4
@@ -61,7 +62,7 @@ class MaestroWritter(Node):
         self.get_logger().warning("Arming spinny things")
         for thruster in range(8):
             self.update_motor(thruster+1, 1500)
-
+import
     
     def disarm(self):
         self.get_logger().warning("diarming spinny things")
