@@ -27,7 +27,7 @@ class ArudoSubTranslator(Node):
         calculation = max(number+1500, 1100)
         # Positive Limit Checking
         calculation = min(calculation, 1900)
-        num.data = calculation
+        num.data = int(round(calculation))
         return num
 
     def yaw_callback(self, msg: Float32):
@@ -36,24 +36,27 @@ class ArudoSubTranslator(Node):
         self.motor_2_pub.publish(num)
         self.motor_4_pub.publish(num)
 
-        self.motor_1_pub.publish(-num)
-        self.motor_3_pub.publish(-num)
+        num.data *= -1
+        self.motor_1_pub.publish(num)
+        self.motor_3_pub.publish(num)
         
     def surge_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
         self.motor_2_pub.publish(num)
         self.motor_1_pub.publish(num)
         
-        self.motor_4_pub.publish(-num)
-        self.motor_3_pub.publish(-num)
+        num.data *= -1
+        self.motor_4_pub.publish(num)
+        self.motor_3_pub.publish(num)
 
     def sway_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
         self.motor_2_pub.publish(num)
         self.motor_1_pub.publish(num)
         
-        self.motor_4_pub.publish(-num)
-        self.motor_3_pub.publish(-num)
+        num.data *= -1
+        self.motor_4_pub.publish(num)
+        self.motor_3_pub.publish(num)
         
 
     def pitch_callback(self, msg: Float32):
