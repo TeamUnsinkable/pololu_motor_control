@@ -42,6 +42,10 @@ class MaestroWritter(Node):
     
     def armer(self, message: Bool):
         if message.data == True:
+            # Re-enable the channel
+            self.arm()
+            
+            # Re-enable
             self.arm()
             self.arm_status = True
             
