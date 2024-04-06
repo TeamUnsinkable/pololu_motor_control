@@ -25,15 +25,15 @@ class MaestroWritter(Node):
         self.arm_status = True
 
         #Subscribe to inputs
-        self.arm_sub = self.create_subscription(Bool, "/arm", self.armer)
-        self.motor_1_sub = self.create_subscription(Int16, "/motor/1/output", self.updateMotor1, 5)
-        self.motor_2_sub = self.create_subscription(Int16, "/motor/2/output", self.updateMotor2, 5)
-        self.motor_3_sub = self.create_subscription(Int16, "/motor/3/output", self.updateMotor3, 5)
-        self.motor_4_sub = self.create_subscription(Int16, "/motor/4/output", self.updateMotor4, 5)
-        self.motor_5_sub = self.create_subscription(Int16, "/motor/5/output", self.updateMotor5, 5)
-        self.motor_6_sub = self.create_subscription(Int16, "/motor/6/output", self.updateMotor6, 5)
-        self.motor_7_sub = self.create_subscription(Int16, "/motor/7/output", self.updateMotor7, 5)
-        self.motor_8_sub = self.create_subscription(Int16, "/motor/8/output", self.updateMotor8, 5)
+        self.arm_sub = self.create_subscription(Bool, "/arm", self.armer, 5)
+        self.motor_1_sub = self.create_subscription(Int16, "/motor1/output", self.updateMotor1, 5)
+        self.motor_2_sub = self.create_subscription(Int16, "/motor2/output", self.updateMotor2, 5)
+        self.motor_3_sub = self.create_subscription(Int16, "/motor3/output", self.updateMotor3, 5)
+        self.motor_4_sub = self.create_subscription(Int16, "/motor4/output", self.updateMotor4, 5)
+        self.motor_5_sub = self.create_subscription(Int16, "/motor5/output", self.updateMotor5, 5)
+        self.motor_6_sub = self.create_subscription(Int16, "/motor6/output", self.updateMotor6, 5)
+        self.motor_7_sub = self.create_subscription(Int16, "/motor7/output", self.updateMotor7, 5)
+        self.motor_8_sub = self.create_subscription(Int16, "/motor8/output", self.updateMotor8, 5)
 
         self.polo = Controller(ttyStr=self.get_parameter("port").get_parameter_value().string_value)
 
