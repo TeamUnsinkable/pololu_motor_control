@@ -27,17 +27,17 @@ class MaestroWritter(Node):
 
         #Subscribe to inputs
         self.arm_sub = self.create_subscription(Bool, "/arm", self.armer, 5)
-        self.motor_1_sub = self.create_subscription(Int16, "/motor1/output", self.updateMotor1, 5)
-        self.motor_2_sub = self.create_subscription(Int16, "/motor2/output", self.updateMotor2, 5)
-        self.motor_3_sub = self.create_subscription(Int16, "/motor3/output", self.updateMotor3, 5)
-        self.motor_4_sub = self.create_subscription(Int16, "/motor4/output", self.updateMotor4, 5)
-        self.motor_5_sub = self.create_subscription(Int16, "/motor5/output", self.updateMotor5, 5)
-        self.motor_6_sub = self.create_subscription(Int16, "/motor6/output", self.updateMotor6, 5)
-        self.motor_7_sub = self.create_subscription(Int16, "/motor7/output", self.updateMotor7, 5)
-        self.motor_8_sub = self.create_subscription(Int16, "/motor8/output", self.updateMotor8, 5)
+        self.motor_1_sub = self.create_subscription(Int16, "/output/motor1", self.updateMotor1, 5)
+        self.motor_2_sub = self.create_subscription(Int16, "/output/motor2", self.updateMotor2, 5)
+        self.motor_3_sub = self.create_subscription(Int16, "/output/motor3", self.updateMotor3, 5)
+        self.motor_4_sub = self.create_subscription(Int16, "/output/motor4", self.updateMotor4, 5)
+        self.motor_5_sub = self.create_subscription(Int16, "/output/motor5", self.updateMotor5, 5)
+        self.motor_6_sub = self.create_subscription(Int16, "/output/motor6", self.updateMotor6, 5)
+        self.motor_7_sub = self.create_subscription(Int16, "/output/motor7", self.updateMotor7, 5)
+        self.motor_8_sub = self.create_subscription(Int16, "/output/motor8", self.updateMotor8, 5)
 
         self.polo = Controller(ttyStr=self.get_parameter("port").get_parameter_value().string_value)
-        self.get_logger().warning("The spinny boys be spinning")
+        self.get_logger().info("The spinny boys be spinning")
 
 
     def _translate_pwm(self, pwm: int):
@@ -46,11 +46,6 @@ class MaestroWritter(Node):
     def armer(self, message: Bool):
         if message.data == True:
             # Re-enable the channel
-            self.arm()
-            
-            sleep(1)
-
-            # Re-enable
             self.arm()
             self.arm_status = True
             
@@ -62,17 +57,17 @@ class MaestroWritter(Node):
     def arm(self):
         self.get_logger().warning("Arming spinny things")
         for thruster in range(8):
-            self.update_motor(thruster+1, 1500)
+            self.polo.setTarget(thruster, 1500)
 
     
     def disarm(self):
         self.get_logger().warning("diarming spinny things")
         for thruster in range(8):
-            self.update_motor(thruster+1, 0)
+            self.polo.setTarget(thruster, 0)
 
     
     def update_motor(self, channel, value):
-        if self.arm_status:
+        if self.arm_status and value != 0:            # Re-enable
             # Set translated value
             self.polo.setTarget(motor_mapping[channel], self._translate_pwm(value))
     

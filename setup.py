@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'controller_node = pololu_motor_control.node:main'
+            'controller_node = pololu_motor_control.node:main',
+            'ardusub_translator = pololu_motor_control.ardusub_translator:main'
         ],
     },
 )
