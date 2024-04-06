@@ -20,7 +20,7 @@ motor_mapping = {
 class MaestroWritter(Node):
     def __init__(self):
         super().__init__('maestro_chief')
-        
+                
         # Declare Parameter
         self.declare_parameter("port", "/dev/ttyACM0")
         self.arm_status = True
@@ -38,6 +38,7 @@ class MaestroWritter(Node):
 
         self.polo = Controller(ttyStr=self.get_parameter("port").get_parameter_value().string_value)
         self.get_logger().warning("The spinny boys be spinning")
+
 
     def _translate_pwm(self, pwm: int):
         return pwm*4
@@ -62,7 +63,7 @@ class MaestroWritter(Node):
         self.get_logger().warning("Arming spinny things")
         for thruster in range(8):
             self.update_motor(thruster+1, 1500)
-import
+
     
     def disarm(self):
         self.get_logger().warning("diarming spinny things")
@@ -83,10 +84,8 @@ import
         # Check if armed
         self.update_motor(2, message.data)
     
-    def updateMotor3(self, message: Int16):
+    def updateMessage: Int16):
         # Check if armed
-        self.update_motor(3, message.data)
-    
     def updateMotor4(self, message: Int16):
         # Check if armed
         self.update_motor(4, message.data)
@@ -113,8 +112,9 @@ def main():
     marco_polo = MaestroWritter()
     while rclpy.ok():
         rclpy.spin(marco_polo)
-
     marco_polo.get_logger().warning("Shutting down")
+    marco_polo.disarm()
+
     
 if __name__ == '__main__':
     main()
