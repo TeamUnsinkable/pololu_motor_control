@@ -18,7 +18,7 @@ motor_mapping = {
 
 class MaestroWritter(Node):
     def __init__(self):
-        super.__init__('maestro_chief')
+        super().__init__('maestro_chief')
         
         # Declare Parameter
         self.declare_parameter("port", "/dev/ttyACM0", "The port which the maestro is connected to")
@@ -35,7 +35,7 @@ class MaestroWritter(Node):
         self.motor_7_sub = self.create_subscription(Int16, "/motor/7/output", self.updateMotor7)
         self.motor_8_sub = self.create_subscription(Int16, "/motor/8/output", self.updateMotor8)
 
-        self.polo = Controller(ttyStr=self.get_parameter("port"))
+        self.polo = Controller(ttyStr=self.get_parameter("port").get_parameter_value().string_value)
 
     def _translate_pwm(self, pwm: int):
         return pwm*4
@@ -101,6 +101,7 @@ class MaestroWritter(Node):
     
         
 def main():
+    rclpy.init()
     marco_polo = MaestroWritter()
     while rclpy.ok():
         rclpy.spin(marco_polo)
