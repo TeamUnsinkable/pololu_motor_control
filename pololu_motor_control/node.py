@@ -24,7 +24,6 @@ class MaestroWritter(Node):
         # Declare Parameter
         self.declare_parameter("port", "/dev/ttyACM0")
         self.declare_parameter("rate", 10)
-        self.arm_status = True
 
         self.motor_out = []
         for _ in range(8):
@@ -49,6 +48,7 @@ class MaestroWritter(Node):
         self.get_logger().info("The spinny boys be spinning")
 
         # Start ESC in off state
+        self.arm_status = False
         self.disarm()
 
 
