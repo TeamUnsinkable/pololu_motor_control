@@ -2,7 +2,7 @@ from pololu_motor_control.maestro import Controller
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Int16, Bool
-from time import sleep
+from threading import Lock
 
 # Converts ardusub thruster mappings to pololu
 # ardusub: pololu
@@ -26,6 +26,8 @@ class MaestroWritter(Node):
         self.declare_parameter("rate", 10)
 
         self.motor_out = []
+        self.motor_lock = Lock()
+
         for _ in range(8):
             self.motor_out.append(1500)
         
@@ -56,6 +58,7 @@ class MaestroWritter(Node):
         return pwm*4
     
     def armer(self, message: Bool):
+        self.motor_lock.acquire()
         if message.data == True:
             # Re-enable the channel
             self.arm()
@@ -64,6 +67,8 @@ class MaestroWritter(Node):
         else:
             self.disarm()
             self.arm_status = False
+            
+        self.motor_lock.release()
 
 
     def arm(self):
@@ -79,9 +84,11 @@ class MaestroWritter(Node):
             self.polo.setTarget(thruster, 0)
 
     def timer_callback(self):
+        self.motor_lock.acquire()
         for idx, value in enumerate(self.motor_out):
             self.get_logger().info(f'Index: {idx} translated to {idx+1}: {motor_mapping[idx+1]}: {value}')
             self._updateMotor(motor_mapping[idx+1], value)
+        self.motor_lock.release()
 
 
     def _updateMotor(self, channel, value):
