@@ -42,6 +42,7 @@ class MaestroWritter(Node):
         self.polo_update = self.create_timer(self._update_rate, self.timer_callback)
         
         self.polo = Controller(ttyStr=self.get_parameter("port").get_parameter_value().string_value)
+        self.get_logger().info(f'Ardusub Translation Table\n{motor_mapping}')
         self.get_logger().info("The spinny boys be spinning")
 
         # Start ESC in off state
