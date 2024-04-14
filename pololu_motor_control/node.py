@@ -7,14 +7,14 @@ from time import sleep
 # Converts ardusub thruster mappings to pololu
 # ardusub: pololu
 motor_mapping = {
-    1: 0,
-    2: 1,
-    3: 2,
-    4: 3,
-    5: 4,
-    6: 5,
-    7: 6,
-    8: 7
+    1: 3,
+    2: 2,
+    3: 1,
+    4: 0,
+    5: 7,
+    6: 6,
+    7: 5,
+    8: 4
 }
 
 class MaestroWritter(Node):
