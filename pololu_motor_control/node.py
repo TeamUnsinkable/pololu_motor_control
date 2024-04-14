@@ -23,7 +23,11 @@ class MaestroWritter(Node):
                 
         # Declare Parameter
         self.declare_parameter("port", "/dev/ttyACM0")
+        self.declare_parameter("rate", 10)
         self.arm_status = True
+
+        self.motor_out = []*8
+        self._update_rate = 1/self.get_parameter("rate").get_parameter_value().integer_value
 
         #Subscribe to inputs
         self.arm_sub = self.create_subscription(Bool, "/arm", self.armer, 5)
@@ -35,9 +39,13 @@ class MaestroWritter(Node):
         self.motor_6_sub = self.create_subscription(Int16, "/output/motor6", self.updateMotor6, 5)
         self.motor_7_sub = self.create_subscription(Int16, "/output/motor7", self.updateMotor7, 5)
         self.motor_8_sub = self.create_subscription(Int16, "/output/motor8", self.updateMotor8, 5)
-
+        self.polo_update = self.create_timer(self._update_rate, self.timer_callback)
+        
         self.polo = Controller(ttyStr=self.get_parameter("port").get_parameter_value().string_value)
         self.get_logger().info("The spinny boys be spinning")
+
+        # Start ESC in off state
+        self.disarm()
 
 
     def _translate_pwm(self, pwm: int):
@@ -55,7 +63,7 @@ class MaestroWritter(Node):
 
 
     def arm(self):
-        self.get_logger().warning("Arming spinny things")
+        self.get_logger().warning("arming spinny things")
         for thruster in range(8):
             self.polo.setTarget(thruster, 1500)
 
@@ -65,43 +73,47 @@ class MaestroWritter(Node):
         for thruster in range(8):
             self.polo.setTarget(thruster, 0)
 
-    
-    def update_motor(self, channel, value):
-        if self.arm_status and value != 0:            # Re-enable
+    def timer_callback(self):
+        for idx, value in enumerate(self.motor_out):
+            self._updateMotor(motor_mapping[idx+1], value)
+
+
+    def _updateMotor(self, channel, value):
+        if self.arm_status == True and value != 0: 
             # Set translated value
             self.polo.setTarget(motor_mapping[channel], self._translate_pwm(value))
     
     def updateMotor1(self, message: Int16):
         # Check if armed
-        self.update_motor(1, message.data)
+        self.motor_out[1-1] = message.data
 
     def updateMotor2(self, message: Int16):
         # Check if armed
-        self.update_motor(2, message.data)
+        self.motor_out[2-1] = message.data
     
     def updateMotor3(self, message: Int16):
         # Check if armed
-        self.update_motor(3, message.data)
+        self.motor_out[3-1] = message.data
 
     def updateMotor4(self, message: Int16):
         # Check if armed
-        self.update_motor(4, message.data)
+        self.motor_out[4-1] = message.data
     
     def updateMotor5(self, message: Int16):
         # Check if armed
-        self.update_motor(5, message.data)
+        self.motor_out[5-1] = message.data
 
     def updateMotor6(self, message: Int16):
         # Check if armed
-        self.update_motor(6, message.data)
+        self.motor_out[6-1] = message.data
 
     def updateMotor7(self, message: Int16):
         # Check if armed
-        self.update_motor(7, message.data)
+        self.motor_out[7-1] = message.data
 
     def updateMotor8(self, message: Int16):
         # Check if armed
-        self.update_motor(8, message.data)
+        self.motor_out[8-1] = message.data
     
         
 def main():
