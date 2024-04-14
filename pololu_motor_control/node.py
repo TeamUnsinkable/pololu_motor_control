@@ -100,41 +100,49 @@ class MaestroWritter(Node):
         # Check if armed
         self.motor_lock.acquire(1)
         self.motor_out[1-1] = message.data
+        self.motor_lock.release()
 
     def updateMotor2(self, message: Int16):
         # Check if armed
         self.motor_lock.acquire(1)
         self.motor_out[2-1] = message.data
+        self.motor_lock.release()
     
     def updateMotor3(self, message: Int16):
         # Check if armed
         self.motor_lock.acquire(1)
         self.motor_out[3-1] = message.data
+        self.motor_lock.release()
 
     def updateMotor4(self, message: Int16):
         # Check if armed
         self.motor_lock.acquire(1)
         self.motor_out[4-1] = message.data
+        self.motor_lock.release()
     
     def updateMotor5(self, message: Int16):
         # Check if armed
         self.motor_lock.acquire(1)
         self.motor_out[5-1] = message.data
+        self.motor_lock.release()
 
     def updateMotor6(self, message: Int16):
         # Check if armed
         self.motor_lock.acquire(1)
         self.motor_out[6-1] = message.data
+        self.motor_lock.release()
 
     def updateMotor7(self, message: Int16):
         # Check if armed
         self.motor_lock.acquire(1)
         self.motor_out[7-1] = message.data
+        self.motor_lock.release()
 
     def updateMotor8(self, message: Int16):
         # Check if armed
         self.motor_lock.acquire(1)
         self.motor_out[8-1] = message.data
+        self.motor_lock.release()
     
         
 def main():
