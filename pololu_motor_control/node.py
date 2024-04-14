@@ -68,10 +68,9 @@ class MaestroWritter(Node):
 
     def arm(self):
         self.get_logger().warning("arming spinny things")
-        self.polo_update = self.create_timer(self._update_rate, self.timer_callback)
         for thruster in range(8):
             self.polo.setTarget(thruster, 1500)
-
+        self.polo_update = self.create_timer(self._update_rate, self.timer_callback)
     
     def disarm(self):
         self.get_logger().warning("diarming spinny things")
