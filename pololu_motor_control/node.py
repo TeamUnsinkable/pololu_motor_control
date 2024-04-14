@@ -58,7 +58,7 @@ class MaestroWritter(Node):
         return pwm*4
     
     def armer(self, message: Bool):
-        self.motor_lock.acquire()
+        self.motor_lock.acquire(1)
         if message.data == True:
             # Re-enable the channel
             self.arm()
@@ -98,43 +98,43 @@ class MaestroWritter(Node):
     
     def updateMotor1(self, message: Int16):
         # Check if armed
-        with self.motor_lock:
-            self.motor_out[1-1] = message.data
+        self.motor_lock.acquire(1)
+        self.motor_out[1-1] = message.data
 
     def updateMotor2(self, message: Int16):
         # Check if armed
-        with self.motor_lock:
-            self.motor_out[2-1] = message.data
+        self.motor_lock.acquire(1)
+        self.motor_out[2-1] = message.data
     
     def updateMotor3(self, message: Int16):
         # Check if armed
-        with self.motor_lock:
-            self.motor_out[3-1] = message.data
+        self.motor_lock.acquire(1)
+        self.motor_out[3-1] = message.data
 
     def updateMotor4(self, message: Int16):
         # Check if armed
-        with self.motor_lock:
-            self.motor_out[4-1] = message.data
+        self.motor_lock.acquire(1)
+        self.motor_out[4-1] = message.data
     
     def updateMotor5(self, message: Int16):
         # Check if armed
-        with self.motor_lock:
-            self.motor_out[5-1] = message.data
+        self.motor_lock.acquire(1)
+        self.motor_out[5-1] = message.data
 
     def updateMotor6(self, message: Int16):
         # Check if armed
-        with self.motor_lock:
-            self.motor_out[6-1] = message.data
+        self.motor_lock.acquire(1)
+        self.motor_out[6-1] = message.data
 
     def updateMotor7(self, message: Int16):
         # Check if armed
-        with self.motor_lock:
-            self.motor_out[7-1] = message.data
+        self.motor_lock.acquire(1)
+        self.motor_out[7-1] = message.data
 
     def updateMotor8(self, message: Int16):
         # Check if armed
-        with self.motor_lock:
-            self.motor_out[8-1] = message.data
+        self.motor_lock.acquire(1)
+        self.motor_out[8-1] = message.data
     
         
 def main():
