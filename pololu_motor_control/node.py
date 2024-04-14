@@ -7,14 +7,14 @@ from threading import Lock
 # Converts ardusub thruster mappings to pololu
 # ardusub: pololu
 motor_mapping = {
-    1: 3,
-    2: 2,
-    3: 1,
-    4: 0,
-    5: 7,
-    6: 6,
-    7: 5,
-    8: 4
+    1: 3+1,
+    2: 2+1,
+    3: 1+1,
+    4: 0+1,
+    5: 7+1,
+    6: 6+1,
+    7: 5+1,
+    8: 4+1
 }
 
 class MaestroWritter(Node):
@@ -94,7 +94,7 @@ class MaestroWritter(Node):
     def _updateMotor(self, channel, value):
         if self.arm_status == True and value != 0: 
             # Set translated value
-            self.polo.setTarget(motor_mapping[channel], self._translate_pwm(value))
+            self.polo.setTarget(motor_mapping[channel], abs(self._translate_pwm(value)))
     
     def updateMotor1(self, message: Int16):
         # Check if armed
