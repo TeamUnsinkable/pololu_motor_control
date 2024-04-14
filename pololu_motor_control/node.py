@@ -68,17 +68,20 @@ class MaestroWritter(Node):
 
     def arm(self):
         self.get_logger().warning("arming spinny things")
+        self.polo_update = self.create_timer(self._update_rate, self.timer_callback)
         for thruster in range(8):
             self.polo.setTarget(thruster, 1500)
 
     
     def disarm(self):
         self.get_logger().warning("diarming spinny things")
+        self.polo_update.cancel()
         for thruster in range(8):
             self.polo.setTarget(thruster, 0)
 
     def timer_callback(self):
         for idx, value in enumerate(self.motor_out):
+            self.get_logger().info(f'Index: {idx} translated to {idx+1}: {motor_mapping[idx+1]}: {value}')
             self._updateMotor(motor_mapping[idx+1], value)
 
 
