@@ -1,6 +1,7 @@
 from pololu_motor_control.maestro import Controller
 import rclpy
 from rclpy.node import Node
+from rclpy.callback_groups import ReentrantCallbackGroup
 from std_msgs.msg import Int16, Bool
 from threading import Lock
 
@@ -31,18 +32,20 @@ class MaestroWritter(Node):
         for _ in range(8):
             self.motor_out.append(1500)
         
+        self.cb_group = ReentrantCallbackGroup()
+
         self._update_rate = 1/self.get_parameter("rate").get_parameter_value().integer_value
 
         #Subscribe to inputs
         self.arm_sub = self.create_subscription(Bool, "/arm", self.armer, 5)
-        self.motor_1_sub = self.create_subscription(Int16, "/output/motor1", self.updateMotor1, 7)
-        self.motor_2_sub = self.create_subscription(Int16, "/output/motor2", self.updateMotor2, 7)
-        self.motor_3_sub = self.create_subscription(Int16, "/output/motor3", self.updateMotor3, 7)
-        self.motor_4_sub = self.create_subscription(Int16, "/output/motor4", self.updateMotor4, 7)
-        self.motor_5_sub = self.create_subscription(Int16, "/output/motor5", self.updateMotor5, 7)
-        self.motor_6_sub = self.create_subscription(Int16, "/output/motor6", self.updateMotor6, 7)
-        self.motor_7_sub = self.create_subscription(Int16, "/output/motor7", self.updateMotor7, 7)
-        self.motor_8_sub = self.create_subscription(Int16, "/output/motor8", self.updateMotor8, 7)
+        self.motor_1_sub = self.create_subscription(Int16, "/output/motor1", self.updateMotor1, 7, callback_group=self.cb_group)
+        self.motor_2_sub = self.create_subscription(Int16, "/output/motor2", self.updateMotor2, 7, callback_group=self.cb_group)
+        self.motor_3_sub = self.create_subscription(Int16, "/output/motor3", self.updateMotor3, 7, callback_group=self.cb_group)
+        self.motor_4_sub = self.create_subscription(Int16, "/output/motor4", self.updateMotor4, 7, callback_group=self.cb_group)
+        self.motor_5_sub = self.create_subscription(Int16, "/output/motor5", self.updateMotor5, 7, callback_group=self.cb_group)
+        self.motor_6_sub = self.create_subscription(Int16, "/output/motor6", self.updateMotor6, 7, callback_group=self.cb_group)
+        self.motor_7_sub = self.create_subscription(Int16, "/output/motor7", self.updateMotor7, 7, callback_group=self.cb_group)
+        self.motor_8_sub = self.create_subscription(Int16, "/output/motor8", self.updateMotor8, 7, callback_group=self.cb_group)
         self.polo_update = self.create_timer(self._update_rate, self.timer_callback)
         
         self.polo = Controller(ttyStr=self.get_parameter("port").get_parameter_value().string_value)
