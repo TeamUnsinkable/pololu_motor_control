@@ -4,6 +4,7 @@ from rclpy.node import Node
 from rclpy.callback_groups import ReentrantCallbackGroup
 from std_msgs.msg import Int16, Bool
 from threading import Lock
+from time import sleep
 
 # Converts ardusub thruster mappings to pololu
 # ardusub: pololu
@@ -20,7 +21,7 @@ motor_mapping = {
 
 class MaestroWritter(Node):
     def __init__(self):
-        super().__init__('maestro_chief')
+        super().__init__('maestro_chief') # type: ignore
                 
         # Declare Parameter
         self.declare_parameter("port", "/dev/ttyACM0")
@@ -61,7 +62,7 @@ class MaestroWritter(Node):
         return pwm*4
     
     def armer(self, message: Bool):
-        self.motor_lock.acquire(1)
+        self.motor_lock.acquire(True)
         if message.data == True:
             # Re-enable the channel
             self.arm()
@@ -78,6 +79,7 @@ class MaestroWritter(Node):
         self.get_logger().warning("arming spinny things")
         for thruster in range(8):
             self.polo.setTarget(thruster, 1500)
+            sleep(2.0)
         self.polo_update = self.create_timer(self._update_rate, self.timer_callback)
     
     def disarm(self):
