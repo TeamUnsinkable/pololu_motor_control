@@ -97,7 +97,7 @@ class MaestroWritter(Node):
 
 
     def _updateMotor(self, channel, value):
-        if self.arm_status == True and value != 0: 
+        if self.arm_status == True and value >= 0: 
             # Set translated value
             self.polo.setTarget(motor_mapping[channel], abs(self._translate_pwm(value)))
     
