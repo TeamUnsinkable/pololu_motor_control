@@ -5,6 +5,7 @@ from rclpy.executors import MultiThreadedExecutor, SingleThreadedExecutor
 from collections import deque
 
 from std_msgs.msg import Int16, Float32
+import numpy as np
 
 class ArudoSubTranslator(Node):
     def __init__(self):
@@ -26,7 +27,15 @@ class ArudoSubTranslator(Node):
         ]
 
         # Indexes are {0: Yaw, 1: Surge, 2: Sway}
-        self.motor_values = [deque()]*8
+        self.yaw = 0
+        self.surge = 0
+        self.sway = 0
+        self.depth = 0
+
+        self.yaw_vector     = np.array([-1, 1, 1, -1, 0, 0, 0, 0])
+        self.surge_vector   = np.array([1, 1, -1, -1, 0, 0, 0, 0])
+        self.sway_vector    = np.array([-1, 1, -1, 1, 0, 0, 0, 0])
+        self.depth_vector   = np.array([0, 0, 0, 0, 1, 1, 1, 1])
 
         self.create_timer(1/self.get_parameter("rate").get_parameter_value().integer_value, self.timer_callback, callback_group=self.timer_cbg)
         self.create_subscription(Float32, "/controls/yaw/hotas", self.yaw_callback, 10, callback_group=self.sub_cbg)
@@ -45,89 +54,43 @@ class ArudoSubTranslator(Node):
     
     def timer_callback(self) -> None:
         begin = self.get_clock().now()
-        for idx, queue in enumerate(self.motor_values):
-            self.get_logger().info(f"Processing PWM for Motor: {idx+1}")
-            # Create Empty Message
-            msg = Int16()
-            # Setup Average Parameters
-            cnt = len(queue)
-            tot = 0
-            
-            # Ensure not empty.
-            # Avoids 0 Divison Error later
-            if cnt == 0:
-                self.get_logger().info(f"No updates for motor: {idx+1}")
-                continue
+        value = Float32()
+        yaw   = self.yaw   * self.yaw_vector
+        surge = self.surge * self.surge_vector
+        sway  = self.sway  * self.sway_vector
+        depth = self.depth * self.depth_vector
 
-            # Try for exepcted amount but be ready for failures
-            try:
-                for _ in range(cnt):
-                    tot += queue.popleft()
-            except IndexError:
-                # No more values in array
-                self.get_logger().info(message=f"Motors IDX: {idx+1} ran into issues computing PWM")
-            
-            # Avoid 0 Division Error 
-            avg = tot/cnt
+        for idx, motor in enumerate(self.motor_publishers):
+            value.data = self._base_pwm_conversion((yaw[idx] + surge[idx] + sway[idx] + depth[idx]))
+            motor.publish(value)
 
-            if avg == 0:
-                msg.data = 1500
-            else:
-                msg.data = self._base_pwm_conversion(avg)+1500
-
-            if round(msg.data) == -1500:
-                continue
-            
-            self.motor_publishers[idx].publish(msg)
         end = self.get_clock().now()
         self.get_logger().debug(f"Timer callback time was: {begin - end}")
-
-
 
     def yaw_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
         # Motor 2 and 3 Foward
-        self.motor_values[1].append(num)
-        self.motor_values[2].append(num)
-
         # Motor 1 and 4 Inversed
-        self.motor_values[0].append(-num)
-        self.motor_values[3].append(-num)
-
+        self.yaw = num
         
     def surge_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
         # Motor 1 and 2
-        self.motor_values[0].append(num)
-        self.motor_values[1].append(num)
-        
         # Motor 3 and 4 Inversed
-        self.motor_values[2].append(-num)
-        self.motor_values[3].append(-num)
-
-
+        self.surge = num
 
     def sway_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
         # Motor 2 and 4
-        self.motor_values[1].append(num)
-        self.motor_values[3].append(num)
-        
         # Motor 1 and 3 Inversed
-        self.motor_values[0].append(-num)
-        self.motor_values[2].append(-num)
-
-     
+        self.sway = num
 
     def pitch_callback(self, msg: Float32):
         pass
 
     def depth_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
-        self.motor_values[4].append(num)
-        self.motor_values[5].append(num)
-        self.motor_values[6].append(num)
-        self.motor_values[7].append(num)
+        self.depth = num
 
 def main():
     rclpy.init()
