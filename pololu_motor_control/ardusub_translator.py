@@ -1,7 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallbackGroup
-from rclpy.executors import MultiThreadedExecutor
+from rclpy.executors import MultiThreadedExecutor, SingleThreadedExecutor
 from collections import deque
 
 from std_msgs.msg import Int16, Float32
@@ -61,11 +61,11 @@ class ArudoSubTranslator(Node):
 
             # Try for exepcted amount but be ready for failures
             try:
-                for _ in range(len(queue)):
+                for _ in range(cnt):
                     tot += queue.popleft()
             except IndexError:
                 # No more values in array
-                self.get_logger().info(f"Motors IDX: {idx+1} ran into issues computing PWM")
+                self.get_logger().info(message=f"Motors IDX: {idx+1} ran into issues computing PWM")
             
             # Avoid 0 Division Error 
             avg = tot/cnt
@@ -131,7 +131,7 @@ class ArudoSubTranslator(Node):
 
 def main():
     rclpy.init()
-    executor = MultiThreadedExecutor()
+    executor = SingleThreadedExecutor()
     ardu_boi = ArudoSubTranslator()
     executor.add_node(ardu_boi)
     try:
