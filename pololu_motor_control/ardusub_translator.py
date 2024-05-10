@@ -52,7 +52,7 @@ class ArudoSubTranslator(Node):
             tot = 0
             if cnt == 0:
                 self.get_logger().info(f"No updates for motor: {idx+1}")
-                return
+                break
             # Try for exepcted amount but be ready for failures
             try:
                 for _ in range(len(queue)):
