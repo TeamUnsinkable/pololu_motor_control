@@ -54,7 +54,7 @@ class ArudoSubTranslator(Node):
     
     def timer_callback(self) -> None:
         begin = self.get_clock().now()
-        value = Float32()
+        value = Int16()
         yaw   = self.yaw   * self.yaw_vector
         surge = self.surge * self.surge_vector
         sway  = self.sway  * self.sway_vector
