@@ -56,8 +56,8 @@ class ArudoSubTranslator(Node):
             # Avoids 0 Divison Error later
             if cnt == 0:
                 self.get_logger().info(f"No updates for motor: {idx+1}")
-                break
-            
+                continue
+
             # Try for exepcted amount but be ready for failures
             try:
                 for _ in range(len(queue)):
@@ -75,7 +75,7 @@ class ArudoSubTranslator(Node):
                 msg.data = self._base_pwm_conversion(avg)+1500
 
             if round(msg.data) == -1500:
-                return
+                continue
             
             self.motor_publishers[idx].publish(msg)
         end = self.get_clock().now()
