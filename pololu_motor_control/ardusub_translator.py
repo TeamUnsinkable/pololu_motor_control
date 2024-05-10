@@ -51,9 +51,13 @@ class ArudoSubTranslator(Node):
             # Setup Average Parameters
             cnt = len(queue)
             tot = 0
+            
+            # Ensure not empty.
+            # Avoids 0 Divison Error later
             if cnt == 0:
                 self.get_logger().info(f"No updates for motor: {idx+1}")
                 break
+            
             # Try for exepcted amount but be ready for failures
             try:
                 for _ in range(len(queue)):
@@ -61,8 +65,8 @@ class ArudoSubTranslator(Node):
             except IndexError:
                 # No more values in array
                 self.get_logger().info(f"Motors IDX: {idx+1} ran into issues computing PWM")
-                break
-
+            
+            # Avoid 0 Division Error 
             avg = tot/cnt
 
             if avg == 0:
