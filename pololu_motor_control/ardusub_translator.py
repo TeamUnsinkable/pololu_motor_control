@@ -52,6 +52,13 @@ class ArudoSubTranslator(Node):
         calculation = min(round(calculation), 400)
         return num
     
+    def _full_pwm_conversion(self, number):
+        # Negative Limit Checking
+        calculation = max(round(number), 1100)
+        # Positive Limit Checking
+        calculation = min(round(calculation), 1900)
+        return calculation
+    
     def timer_callback(self) -> None:
         begin = self.get_clock().now()
         value = Int16()
@@ -61,7 +68,8 @@ class ArudoSubTranslator(Node):
         depth = self.depth * self.depth_vector
 
         for idx, motor in enumerate(self.motor_publishers):
-            value.data = self._base_pwm_conversion((yaw[idx] + surge[idx] + sway[idx] + depth[idx]))
+            self.get_logger().info(f"Motor {idx}: [ya:{yaw[idx]}, su:{surge[idx]}, sw:{sway[idx]}, dp:{depth[idx]} ] ")
+            value.data = int(self._base_pwm_conversion((yaw[idx] + surge[idx] + sway[idx] + depth[idx])) + 1500)
             motor.publish(value)
 
         end = self.get_clock().now()
