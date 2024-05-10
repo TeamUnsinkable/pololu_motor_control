@@ -3,8 +3,11 @@ import rclpy
 from rclpy.node import Node
 from rclpy.callback_groups import ReentrantCallbackGroup
 from std_msgs.msg import Int16, Bool
+from std_srvs.srv import SetBool
 from threading import Lock
 from time import sleep
+
+from amra_utils_py.helpers import generate_header
 
 # Converts ardusub thruster mappings to pololu
 # ardusub: pololu
@@ -38,7 +41,8 @@ class MaestroWritter(Node):
         self._update_rate = 1/self.get_parameter("rate").get_parameter_value().integer_value
 
         #Subscribe to inputs
-        self.arm_sub = self.create_subscription(Bool, "/arm", self.armer, 5)
+        #self.arm_sub = self.create_subscription(Bool, "/arm", self.armer, 5)
+        self.arm_srv = self.create_service(SetBool, "arm", self.armer)
         self.motor_1_sub = self.create_subscription(Int16, "/output/motor1", self.updateMotor1, 7, callback_group=self.cb_group)
         self.motor_2_sub = self.create_subscription(Int16, "/output/motor2", self.updateMotor2, 7, callback_group=self.cb_group)
         self.motor_3_sub = self.create_subscription(Int16, "/output/motor3", self.updateMotor3, 7, callback_group=self.cb_group)
@@ -61,19 +65,24 @@ class MaestroWritter(Node):
     def _translate_pwm(self, pwm: int):
         return pwm*4
     
-    def armer(self, message: Bool):
+    
+    
+    def armer(self, request: SetBool.Request, response: SetBool.Response) -> SetBool.Response:
         self.motor_lock.acquire(True)
-        if message.data == True:
+        request.data
+        if request.data == True:
             # Re-enable the channel
             self.arm()
             self.arm_status = True
-            
         else:
             self.disarm()
             self.arm_status = False
             
         self.motor_lock.release()
-
+        response.success = self.arm_status
+        response.message = "The spinny boys are following suit"
+        return response
+        
 
     def arm(self):
         self.get_logger().warning("arming spinny things")
