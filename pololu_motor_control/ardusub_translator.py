@@ -14,14 +14,14 @@ class ArudoSubTranslator(Node):
 
         self.declare_parameter("rate", 12)
         self.motor_publishers = [
-            self.create_publisher(Int16, "/output/motor1", 10),
-            self.create_publisher(Int16, "/output/motor2", 10),
-            self.create_publisher(Int16, "/output/motor3", 10),
-            self.create_publisher(Int16, "/output/motor4", 10),
-            self.create_publisher(Int16, "/output/motor5", 10),
-            self.create_publisher(Int16, "/output/motor6", 10),
-            self.create_publisher(Int16, "/output/motor7", 10),
-            self.create_publisher(Int16, "/output/motor8", 10),
+            self.create_publisher(Int16, "/output/motor1", 10, callback_group=self.sub_cbg),
+            self.create_publisher(Int16, "/output/motor2", 10, callback_group=self.sub_cbg),
+            self.create_publisher(Int16, "/output/motor3", 10, callback_group=self.sub_cbg),
+            self.create_publisher(Int16, "/output/motor4", 10, callback_group=self.sub_cbg),
+            self.create_publisher(Int16, "/output/motor5", 10, callback_group=self.sub_cbg),
+            self.create_publisher(Int16, "/output/motor6", 10, callback_group=self.sub_cbg),
+            self.create_publisher(Int16, "/output/motor7", 10, callback_group=self.sub_cbg),
+            self.create_publisher(Int16, "/output/motor8", 10, callback_group=self.sub_cbg),
         ]
 
         # Indexes are {0: Yaw, 1: Surge, 2: Sway}
@@ -43,6 +43,7 @@ class ArudoSubTranslator(Node):
         return num
     
     def timer_callback(self) -> None:
+        begin = self.get_clock().now()
         for idx, queue in enumerate(self.motor_values):
             self.get_logger().info(f"Processing PWM for Motor: {idx+1}")
             # Create Empty Message
@@ -63,6 +64,7 @@ class ArudoSubTranslator(Node):
                 break
 
             avg = tot/cnt
+
             if avg == 0:
                 msg.data = 1500
             else:
@@ -72,6 +74,8 @@ class ArudoSubTranslator(Node):
                 return
             
             self.motor_publishers[idx].publish(msg)
+        end = self.get_clock().now()
+        self.get_logger().debug(f"Timer callback time was: {begin - end}")
 
 
 
