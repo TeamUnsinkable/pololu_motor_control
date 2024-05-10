@@ -116,10 +116,10 @@ class ArudoSubTranslator(Node):
     def depth_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
         # Motor 2 and 4
-        self.motor_values[4][3] += num.data
-        self.motor_values[5][3] += num.data
-        self.motor_values[6][3] += num.data
-        self.motor_values[7][3] += num.data
+        self.motor_values[4].append(num)
+        self.motor_values[5].append(num)
+        self.motor_values[6].append(num)
+        self.motor_values[7].append(num)
 
 def main():
     rclpy.init()
