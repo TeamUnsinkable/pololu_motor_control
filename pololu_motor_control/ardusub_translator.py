@@ -10,18 +10,19 @@ class ArudoSubTranslator(Node):
     def __init__(self):
         super().__init__("ArduSubTranslator") # type: ignore
         self.sub_cbg = ReentrantCallbackGroup()
+        self.pub_cbg = ReentrantCallbackGroup()
         self.timer_cbg = MutuallyExclusiveCallbackGroup()
 
         self.declare_parameter("rate", 12)
         self.motor_publishers = [
-            self.create_publisher(Int16, "/output/motor1", 10, callback_group=self.sub_cbg),
-            self.create_publisher(Int16, "/output/motor2", 10, callback_group=self.sub_cbg),
-            self.create_publisher(Int16, "/output/motor3", 10, callback_group=self.sub_cbg),
-            self.create_publisher(Int16, "/output/motor4", 10, callback_group=self.sub_cbg),
-            self.create_publisher(Int16, "/output/motor5", 10, callback_group=self.sub_cbg),
-            self.create_publisher(Int16, "/output/motor6", 10, callback_group=self.sub_cbg),
-            self.create_publisher(Int16, "/output/motor7", 10, callback_group=self.sub_cbg),
-            self.create_publisher(Int16, "/output/motor8", 10, callback_group=self.sub_cbg),
+            self.create_publisher(Int16, "/output/motor1", 10, callback_group=self.pub_cbg),
+            self.create_publisher(Int16, "/output/motor2", 10, callback_group=self.pub_cbg),
+            self.create_publisher(Int16, "/output/motor3", 10, callback_group=self.pub_cbg),
+            self.create_publisher(Int16, "/output/motor4", 10, callback_group=self.pub_cbg),
+            self.create_publisher(Int16, "/output/motor5", 10, callback_group=self.pub_cbg),
+            self.create_publisher(Int16, "/output/motor6", 10, callback_group=self.pub_cbg),
+            self.create_publisher(Int16, "/output/motor7", 10, callback_group=self.pub_cbg),
+            self.create_publisher(Int16, "/output/motor8", 10, callback_group=self.pub_cbg),
         ]
 
         # Indexes are {0: Yaw, 1: Surge, 2: Sway}
@@ -123,7 +124,6 @@ class ArudoSubTranslator(Node):
 
     def depth_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
-        # Motor 2 and 4
         self.motor_values[4].append(num)
         self.motor_values[5].append(num)
         self.motor_values[6].append(num)
