@@ -12,14 +12,14 @@ from amra_utils_py.helpers import generate_header
 # Converts ardusub thruster mappings to pololu
 # ardusub: pololu
 motor_mapping = {
-    1: 3+1,
-    2: 2+1,
-    3: 1+1,
-    4: 0+1,
-    5: 7+1,
-    6: 6+1,
-    7: 5+1,
-    8: 4+1
+    1: 1,
+    2: 2,
+    3: 3,
+    4: 4,
+    5: 5,
+    6: 6,
+    7: 7,
+    8: 8
 }
 
 class MaestroWritter(Node):
@@ -95,7 +95,7 @@ class MaestroWritter(Node):
         self.get_logger().warning("diarming spinny things")
         self.polo_update.cancel()
         for thruster in range(8):
-            self.polo.setTarget(thruster, 0)
+            self.polo.setTarget(1+thruster, 0)
 
     def timer_callback(self):
         self.motor_lock.acquire(True)
