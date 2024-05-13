@@ -68,7 +68,7 @@ class ArudoSubTranslator(Node):
         depth = self.depth * self.depth_vector
 
         for idx, motor in enumerate(self.motor_publishers):
-            self.get_logger().info(f"Motor {idx}: [ya:{yaw[idx]}, su:{surge[idx]}, sw:{sway[idx]}, dp:{depth[idx]} ] ")
+            self.get_logger().info(f"Motor {idx}: {(yaw[idx] + surge[idx] + sway[idx] + depth[idx]) + 1500}  [ya:{yaw[idx]}, su:{surge[idx]}, sw:{sway[idx]}, dp:{depth[idx]} ] ")
             value.data = int(self._base_pwm_conversion((yaw[idx] + surge[idx] + sway[idx] + depth[idx])) + 1500)
             motor.publish(value)
 
