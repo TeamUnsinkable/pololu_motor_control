@@ -83,7 +83,7 @@ class MaestroWritter(Node):
         response.message = "The spinny boys are following suit"
         return response
         
-
+    # TODO Add use of motor mapping list
     def arm(self):
         self.get_logger().warning("arming spinny things")
         for thruster in range(8):
@@ -101,14 +101,14 @@ class MaestroWritter(Node):
         self.motor_lock.acquire(True)
         for idx, value in enumerate(self.motor_out):
             self.get_logger().info(f'Index: {idx} translated to {idx+1}: {motor_mapping[idx+1]}: {value}')
-            self._updateMotor(motor_mapping[idx+1], value)
+            self._updateMotor(idx, value)
         self.motor_lock.release()
 
 
     def _updateMotor(self, channel, value):
         if self.arm_status == True and value >= 0: 
             # Set translated value
-            self.polo.setTarget(channel, abs(self._translate_pwm(value)))
+            self.polo.setTarget(motor_mapping[channel+1], abs(self._translate_pwm(value)))
     
     def updateMotor1(self, message: Int16):
         # Check if armed
