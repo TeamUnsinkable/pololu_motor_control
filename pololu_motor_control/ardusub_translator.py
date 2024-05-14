@@ -4,7 +4,7 @@ from rclpy.callback_groups import MutuallyExclusiveCallbackGroup, ReentrantCallb
 from rclpy.executors import MultiThreadedExecutor, SingleThreadedExecutor
 from collections import deque
 
-from std_msgs.msg import Int16, Float32
+from std_msgs.msg import Int16, Float32, Float64
 import numpy as np
 
 class ArudoSubTranslator(Node):
@@ -26,22 +26,38 @@ class ArudoSubTranslator(Node):
             self.create_publisher(Int16, "/output/motor8", 10, callback_group=self.pub_cbg),
         ]
 
-        # Indexes are {0: Yaw, 1: Surge, 2: Sway}
+        # Rotational Values
         self.yaw = 0
+        self.pitch = 0
+        self.roll = 0
+
+        # Translational Values
         self.surge = 0
         self.sway = 0
         self.depth = 0
 
+        # Rotational Vector
         self.yaw_vector     = np.array([-1, 1, 1, -1, 0, 0, 0, 0])
+        self.pitch_vector   = np.array([0, 0, 0, 0, -1, -1, 1, 1])
+        self.roll_vector    = np.array([0, 0, 0, 0, -1, 1, -1, 1])
+
+        # Translational Vector
         self.surge_vector   = np.array([1, 1, -1, -1, 0, 0, 0, 0])
         self.sway_vector    = np.array([-1, 1, -1, 1, 0, 0, 0, 0])
         self.depth_vector   = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+        
 
         self.create_timer(1/self.get_parameter("rate").get_parameter_value().integer_value, self.timer_callback, callback_group=self.timer_cbg)
-        self.create_subscription(Float32, "/controls/yaw/hotas", self.yaw_callback, 10, callback_group=self.sub_cbg)
+        # Rotational PIDs
+        self.create_subscription(Float64, "/controls/roll/control_effort", self.yaw_callback, 10, callback_group=self.sub_cbg)
+        self.create_subscription(Float64, "/controls/pitch/control_effort", self.yaw_callback, 10, callback_group=self.sub_cbg)
+        self.create_subscription(Float64, "/controls/yaw/control_effort", self.yaw_callback, 10, callback_group=self.sub_cbg)
+        
+        # Translational Inputs
         self.create_subscription(Float32, "/controls/surge/hotas", self.surge_callback, 10, callback_group=self.sub_cbg)
         self.create_subscription(Float32, "/controls/sway/hotas", self.sway_callback, 10, callback_group=self.sub_cbg)
         self.create_subscription(Float32, "/controls/depth/hotas", self.depth_callback, 10, callback_group=self.sub_cbg)
+
         self.get_logger().info("Doing the dishes")
 
     def _base_pwm_conversion(self, number):
@@ -53,6 +69,7 @@ class ArudoSubTranslator(Node):
         return num
     
     def _full_pwm_conversion(self, number):
+        number = self._base_pwm_conversion(number) + 1500
         # Negative Limit Checking
         calculation = max(round(number), 1100)
         # Positive Limit Checking
@@ -62,25 +79,38 @@ class ArudoSubTranslator(Node):
     def timer_callback(self) -> None:
         begin = self.get_clock().now()
         value = Int16()
+
         yaw   = self.yaw   * self.yaw_vector
+        pitch = self.pitch * self.pitch_vector
+        roll  = self.pitch * self.roll_vector
+
         surge = self.surge * self.surge_vector
         sway  = self.sway  * self.sway_vector
         depth = self.depth * self.depth_vector
+        
 
         for idx, motor in enumerate(self.motor_publishers):
-            self.get_logger().info(f"Motor {idx}: {(yaw[idx] + surge[idx] + sway[idx] + depth[idx]) + 1500}  [ya:{yaw[idx]}, su:{surge[idx]}, sw:{sway[idx]}, dp:{depth[idx]} ] ")
-            value.data = int(self._base_pwm_conversion((yaw[idx] + surge[idx] + sway[idx] + depth[idx])) + 1500)
+            self.get_logger().info(f"Motor {idx}: {(yaw[idx] + surge[idx] + sway[idx] + depth[idx] +pitch[idx]) + 1500}  [ya:{yaw[idx]}, su:{surge[idx]}, sw:{sway[idx]}, dp:{depth[idx]}, pi:{pitch[idx]} ] ")
+            value.data = int(self._base_pwm_conversion((surge[idx] + sway[idx] + depth[idx] + pitch[idx] + roll[idx] + yaw[idx])))
             motor.publish(value)
 
         end = self.get_clock().now()
         self.get_logger().debug(f"Timer callback time was: {begin - end}")
 
+    ## Rotational Callbacks
     def yaw_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
-        # Motor 2 and 3 Foward
-        # Motor 1 and 4 Inversed
         self.yaw = num
-        
+    
+    def roll_callback(self, msg: Float32):
+        num = self._base_pwm_conversion(msg.data)
+        self.roll = num
+
+    def pitch_callback(self, msg: Float32):
+        num = self._base_pwm_conversion(msg.data)
+        self.pitch = num
+
+    # Translational Callbacks
     def surge_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
         # Motor 1 and 2
@@ -92,9 +122,6 @@ class ArudoSubTranslator(Node):
         # Motor 2 and 4
         # Motor 1 and 3 Inversed
         self.sway = num
-
-    def pitch_callback(self, msg: Float32):
-        pass
 
     def depth_callback(self, msg: Float32):
         num = self._base_pwm_conversion(msg.data)
