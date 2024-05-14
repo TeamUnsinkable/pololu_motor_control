@@ -54,9 +54,9 @@ class ArudoSubTranslator(Node):
         self.create_subscription(Float64, "/controls/yaw/control_effort", self.yaw_callback, 10, callback_group=self.sub_cbg)
         
         # Translational Inputs
-        self.create_subscription(Float32, "/controls/surge/hotas", self.surge_callback, 10, callback_group=self.sub_cbg)
-        self.create_subscription(Float32, "/controls/sway/hotas", self.sway_callback, 10, callback_group=self.sub_cbg)
-        self.create_subscription(Float32, "/controls/depth/hotas", self.depth_callback, 10, callback_group=self.sub_cbg)
+        self.create_subscription(Float64, "/controls/surge/hotas", self.surge_callback, 10, callback_group=self.sub_cbg)
+        self.create_subscription(Float64, "/controls/sway/hotas", self.sway_callback, 10, callback_group=self.sub_cbg)
+        self.create_subscription(Float64, "/controls/depth/hotas", self.depth_callback, 10, callback_group=self.sub_cbg)
 
         self.get_logger().info("Doing the dishes")
 
@@ -73,6 +73,7 @@ class ArudoSubTranslator(Node):
         # Negative Limit Checking
         calculation = max(round(number), 1100)
         # Positive Limit Checking
+
         calculation = min(round(calculation), 1900)
         return calculation
     
