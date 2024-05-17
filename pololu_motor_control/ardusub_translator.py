@@ -38,13 +38,13 @@ class ArudoSubTranslator(Node):
 
         # Rotational Vector
         self.yaw_vector     = np.array([-1, 1, 1, -1, 0, 0, 0, 0])
-        self.pitch_vector   = np.array([0, 0, 0, 0, -1, -1, 1, 1])
-        self.roll_vector    = np.array([0, 0, 0, 0, -1, 1, -1, 1])
+        self.pitch_vector   = np.array([0, 0, 0, 0, 1, 1, -1, -1])
+        self.roll_vector    = np.array([0, 0, 0, 0, 1, -1, 1, -1])
 
         # Translational Vector
-        self.surge_vector   = np.array([1, 1, -1, -1, 0, 0, 0, 0])
+        self.surge_vector   = np.array([-1, -1, 1, 1, 0, 0, 0, 0])
         self.sway_vector    = np.array([-1, 1, -1, 1, 0, 0, 0, 0])
-        self.depth_vector   = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+        self.depth_vector   = np.array([0, 0, 0, 0, -1, -1, -1, -1])
         
 
         self.create_timer(1/self.get_parameter("rate").get_parameter_value().integer_value, self.timer_callback, callback_group=self.timer_cbg)
