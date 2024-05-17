@@ -63,24 +63,22 @@ class ArudoSubTranslator(Node):
     def _base_pwm_conversion(self, number):
         num = round(number)
         # Negative Limit Checking
-        calculation = max(round(num), -400)
+        calculation = max(round(num), -140)
         # Positive Limit Checking
-        calculation = min(round(calculation), 400)
+        calculation = min(round(calculation), 140)
         return num
     
     def _full_pwm_conversion(self, number):
         number = self._base_pwm_conversion(number) + 1500
         # Negative Limit Checking
-        calculation = max(round(number), 1100)
+        calculation = max(round(number), 1220)
         # Positive Limit Checking
-
-        calculation = min(round(calculation), 1900)
+        calculation = min(round(calculation), 1710)
         return calculation
     
     def timer_callback(self) -> None:
         begin = self.get_clock().now()
         value = Int16()
-
         yaw   = self.yaw   * self.yaw_vector
         pitch = self.pitch * self.pitch_vector
         roll  = self.pitch * self.roll_vector
@@ -92,7 +90,8 @@ class ArudoSubTranslator(Node):
 
         for idx, motor in enumerate(self.motor_publishers):
             self.get_logger().info(f"Motor {idx}: {(yaw[idx] + surge[idx] + sway[idx] + depth[idx] +pitch[idx]) + 1500}  [ya:{yaw[idx]}, su:{surge[idx]}, sw:{sway[idx]}, dp:{depth[idx]}, pi:{pitch[idx]} ] ")
-            value.data = int(self._base_pwm_conversion((surge[idx] + sway[idx] + depth[idx] + pitch[idx] + roll[idx] + yaw[idx])))
+            # self.get_logger().info(f"Motor {idx}: [ya:{yaw[idx]}, su:{surge[idx]}, sw:{sway[idx]}, dp:{depth{[idx]} ] ")
+            value.data = int(self._base_pwm_conversion((yaw[idx] + surge[idx] + sway[idx] + depth[idx] + pitch[idx]+ roll[idx])) + 1500)
             motor.publish(value)
 
         end = self.get_clock().now()
