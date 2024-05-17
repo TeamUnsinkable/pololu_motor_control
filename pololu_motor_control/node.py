@@ -76,11 +76,11 @@ class MaestroWritter(Node):
         else:
             self.disarm()
             self.arm_status = False
-            
         self.motor_lock.release()
         response.success = self.arm_status
-        response.message = "The spinny boys are following suit"
+        response.message = "The spinny bois are following suit"
         return response
+            
         
     # TODO Add use of motor mapping list
     def arm(self):
@@ -99,7 +99,7 @@ class MaestroWritter(Node):
     def timer_callback(self):
         self.motor_lock.acquire(True)
         for idx, value in enumerate(self.motor_out):
-            self.get_logger().info(f'Index: {idx} translated to {idx+1}: {motor_mapping[idx+1]}: {value}')
+            #             self.get_logger().info(f'Index: {idx} translated to {idx+1}: {motor_mapping[idx+1]}: {value}')
             self._updateMotor(idx, value)
         self.motor_lock.release()
 
