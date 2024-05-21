@@ -71,9 +71,9 @@ class ArudoSubTranslator(Node):
     def _full_pwm_conversion(self, number):
         number = self._base_pwm_conversion(number) + 1500
         # Negative Limit Checking
-        calculation = max(round(number), 1220)
+        calculation = max(round(number), 1330)
         # Positive Limit Checking
-        calculation = min(round(calculation), 1710)
+        calculation = min(round(calculation), 1670)
         return calculation
     
     def timer_callback(self) -> None:
